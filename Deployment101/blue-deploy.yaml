@@ -1,16 +1,19 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-1.10
 spec:
   replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx
   template:
     metadata:
       labels:
-        name: nginx
+        app.kubernetes.io/name: nginx
         version: "1.10"
     spec:
-      containers: 
+      containers:
         - name: nginx
           image: nginx:1.10
           ports:
