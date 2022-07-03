@@ -14,8 +14,33 @@ A Kubernetes Service acts as an abstraction layer. In a stateless application li
 
 # Deploying a Stateful Application Using Kubernetes Statefulset
 
-If you look at [web_stateful.yaml](https://github.com/collabnix/kubelabs/blob/master/StatefulSets101/web_stateful.yaml) file, you will find a snippet around how we are deploying a stateful application. For simplicity, are we using Nginx  as the pod image. The deployment is made up of 2 Nginx web servers; both of them are connected to a persistent volume. For example, look at web_stateful.yaml file under the current location.
+If you look at [web_stateful.yaml](https://github.com/collabnix/kubelabs/blob/master/StatefulSets101/web_stateful.yaml) file, you will find a snippet around how we are deploying a stateful application. For simplicity, are we using Nginx  as the pod image. The deployment is made up of 2 Nginx web servers; both of them are connected to a persistent volume. For example, look at web.yaml file under the current location.
 
+https://github.com/kubernetes/website/blob/main/content/en/examples/application/web/web.yaml
+
+
+Explain Stateful sets needs HEadless service because they need a sticky Identity, with headless service type, it gives unique Identifier to pod as identification.
+When u scale up StatefulSet each pod come up one by one ,only when one pod is ready. Each new pod/instance (example-: mysql ) clone from last instance.
+When you Scale down lastly created pod will be deleted first than second last one this way one by one scale down of pods will happen gracefully.
+StatefullSet using Headless Service-: Creates automatic domain Name & subdomains/A-record.
+mysql-0-mysql-h.default.svc.cluster.local [we can use this as Master DB]
+mysql-1-mysql-h.default.svc.cluster.local
+mysql-2-mysql-h.default.svc.cluster.local
+When a StatefulSet's .spec.updateStrategy.type is set to RollingUpdate, the StatefulSet controller will delete and recreate each Pod in the StatefulSet. It will proceed in the same order as Pod termination (from the largest ordinal to the smallest), updating each Pod one at a time.
+The Kubernetes control plane waits until an updated Pod is Running and Ready prior to updating its predecessor. If you have set .spec.minReadySeconds (see Minimum Ready Seconds), the control plane additionally waits that amount of time after the Pod turns ready, before moving on.
+
+Limitations 
+The storage for a given Pod must either be provisioned by a PersistentVolume Provisioner based on the requested storage class, or pre-provisioned by an admin.
+Deleting and/or scaling a StatefulSet down will not delete the volumes associated with the StatefulSet. This is done to ensure data safety, which is generally more valuable than an automatic purge of all related StatefulSet resources.
+StatefulSets currently require a Headless Service to be responsible for the network identity of the Pods. You are responsible for creating this Service.
+StatefulSets do not provide any guarantees on the termination of pods when a StatefulSet is deleted. To achieve ordered and graceful termination of the pods in the StatefulSet, it is possible to scale the StatefulSet down to 0 prior to deletion.
+When using Rolling Updates with the default Pod Management Policy (OrderedReady), it's possible to get into a broken state that requires manual intervention to repair.
+Always better to use NFS for PVC, as local volumes won't get attached to pod created in different hosts.
+
+
+Don't Follow Anything below
+Don't Follow Anything below
+Don't Follow Anything below Don't Follow Anything below Don't Follow Anything below Don't Follow Anything below Don't Follow Anything below
 Before we start discussing the details of this definition, notice that the file actually contains two definitions: the storage class that the StatefulSet is using and the StatefulSet itself.
 
 
